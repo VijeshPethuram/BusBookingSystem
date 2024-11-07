@@ -1,0 +1,3832 @@
+=== D:/Angular/hello-world/src/app\app-routing.module.ts ===
+// app-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { LoginComponent } from './login/login.component';
+import { HomeComponent } from './home/home.component';
+import { RegisterComponent } from './register/register.component';
+import { AuthGuard } from './auth.guard';
+import { BookBusComponent } from './book-bus/book-bus.component';
+import { AddBusComponent } from './add-bus/add-bus.component';
+import { BusListComponent } from './bus-list/bus-list.component';
+import { AdminComponent } from './admin/admin.component';
+import { EditbusComponent } from './editbus/editbus.component';
+import { ReservationsComponent } from './reservations/reservations.component';
+import { DeletebusComponent } from './deletebus/deletebus.component';
+import { SpecificReservesComponent } from './specific-reserves/specific-reserves.component';
+
+const routes: Routes = [
+  { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'book', component: BookBusComponent,canActivate:[AuthGuard] },
+  { path: '', component: HomeComponent },
+  { path: 'home', component: HomeComponent },
+  {path:'addbus',component: AddBusComponent,canActivate:[AuthGuard]},
+  {path:'showbus',component: BusListComponent,canActivate:[AuthGuard]},
+  {path:'admin',component: AdminComponent,canActivate:[AuthGuard]},
+  {path:'editbus',component: EditbusComponent,canActivate:[AuthGuard]},
+  {path:'reserves',component: ReservationsComponent,canActivate:[AuthGuard]},
+  {path:'deletebus',component: DeletebusComponent,canActivate:[AuthGuard]},
+  {path:'userreserves',component: SpecificReservesComponent,canActivate:[AuthGuard]},
+
+
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+
+=== D:/Angular/hello-world/src/app\app.component.css ===
+*{
+    font-family: 'Poppins';
+}
+
+=== D:/Angular/hello-world/src/app\app.component.html ===
+<router-outlet></router-outlet>
+
+=== D:/Angular/hello-world/src/app\app.component.spec.ts ===
+import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule
+      ],
+      declarations: [
+        AppComponent
+      ],
+    }).compileComponents();
+  });
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it(`should have as title 'ex6'`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('ex6');
+  });
+
+  it('should render title', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ex6');
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\app.component.ts ===
+import { Component } from '@angular/core';
+import { LoginComponent } from './login/login.component';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModel } from '@angular/forms';
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls:[ './app.component.css','../assets/bootstrap.min.css'],
+
+})
+export class AppComponent {
+  title="Bus Booking"
+}
+
+
+=== D:/Angular/hello-world/src/app\app.module.ts ===
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { FormsModule } from '@angular/forms';
+
+import { LoginComponent } from './login/login.component';
+import { RouterModule } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { RegisterComponent } from './register/register.component';
+import { AuthService } from './auth.service';
+import { HttpClient, HttpClientModule, HttpHandler } from '@angular/common/http';
+import { BookBusComponent } from './book-bus/book-bus.component';
+import { AddBusComponent } from './add-bus/add-bus.component';
+import { BusListComponent } from './bus-list/bus-list.component';
+import { CommonModule } from '@angular/common';
+import { AdminComponent } from './admin/admin.component';
+import { EditbusComponent } from './editbus/editbus.component';
+import { DeletebusComponent } from './deletebus/deletebus.component';
+import { ReservationsComponent } from './reservations/reservations.component';
+import { SpecificReservesComponent } from './specific-reserves/specific-reserves.component';
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    HomeComponent,
+    RegisterComponent,
+    BookBusComponent,
+    AddBusComponent,
+    BusListComponent,
+    AdminComponent,
+    EditbusComponent,
+    DeletebusComponent,
+    ReservationsComponent,
+    SpecificReservesComponent,
+  ],
+  imports: [
+    CommonModule,
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule
+  ],
+  providers: [AuthService],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+=== D:/Angular/hello-world/src/app\auth.guard.ts ===
+ import { Injectable } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
+import { AuthService } from './auth.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
+  constructor(private authService: AuthService, private router: Router) {}
+
+  canActivate(): boolean {
+    if (this.authService.isLoggedIn()) {
+      return true;
+    } else {
+      this.router.navigateByUrl('/login');
+      return false;
+    }
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\auth.service.spec.ts ===
+import { TestBed } from '@angular/core/testing';
+
+import { AuthService } from './auth.service';
+
+describe('AuthService', () => {
+  let service: AuthService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(AuthService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\auth.service.ts ===
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private baseUrl = 'http://localhost:3000/api';
+  private authTokenKey = 'authToken';
+
+  constructor(private http: HttpClient) { }
+
+  register(username: string, password: string,name:string,age:number,phone:number,gender:string,addr:string,adhaar:number,role:string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/register`, { username, password,name,age,phone,gender,addr,adhaar,role });
+  }
+
+  login(username: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/login`, { username, password }).pipe(
+      tap((response) => {
+        if (response.token) {
+           localStorage.setItem(this.authTokenKey, response.token);
+        }
+      })
+    );
+  }
+
+  logout(): void {
+     localStorage.removeItem(this.authTokenKey);
+  }
+
+  isLoggedIn(): boolean {
+     return !!localStorage.getItem(this.authTokenKey);
+  }
+
+  getToken(): string | null {
+     return localStorage.getItem(this.authTokenKey);
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\bus.service.spec.ts ===
+import { TestBed } from '@angular/core/testing';
+
+import { BusService } from './bus.service';
+
+describe('BusService', () => {
+  let service: BusService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(BusService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\bus.service.ts ===
+ 
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+
+
+export class BusService {
+  private baseUrl = 'http://localhost:3000/api/buses';
+  private reserveUrl = 'http://localhost:3000/api/reserve';
+  constructor(private http: HttpClient) { }
+
+  createBus(busData: any): Observable<any> {
+    return this.http.post<any>(this.baseUrl, busData);
+  }
+
+  getBuses(): Observable<any> {
+    return this.http.get<any>(this.baseUrl);
+  }
+
+  getBusById(busId: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${busId}`);
+  }
+
+  updateBus(busId: string, busData: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${busId}`, busData);
+  }
+
+  deleteBus(busId: string): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${busId}`);
+  }
+
+  reserveBus(busData:any): Observable<any> {
+    return this.http.post<any>(this.reserveUrl,busData);
+  }
+  getReserve(): Observable<any> {
+    return this.http.get<any>(this.reserveUrl);
+  }
+
+}
+
+
+=== D:/Angular/hello-world/src/app\add-bus\add-bus.component.css ===
+#body {
+  background: linear-gradient(135deg, #00aaff, #ff00aa); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120vh;
+}
+.container {
+  width: 80%; 
+  max-width: 150px;
+  background-color: white;
+  border-radius: 10px;
+}
+.card {
+  padding: 20px;
+  border-radius: 10px;
+}
+.form-control{
+  border: 1px solid black !important;
+  border-radius: 10px !important;
+  background-color: rgb(182, 177, 172);
+  margin: 1px !important;
+}
+.form-control:hover{
+  
+  background-color: rgb(207, 182, 198);
+}
+
+=== D:/Angular/hello-world/src/app\add-bus\add-bus.component.html ===
+<div id="body">
+<div class="container">
+  <div class="card">
+    <h2 class="text-center">Add New Journey</h2>
+    <form (ngSubmit)="addBus()">
+      <div class="form-group">
+        <label for="busNumber">Bus Number:</label>
+        <input type="text" class="form-control" id="busNumber" [(ngModel)]="busData.busNumber" name="busNumber" required>
+      </div>
+      <div class="form-group">
+        <label for="capacity">Capacity:</label>
+        <input type="number" class="form-control" id="capacity" [(ngModel)]="busData.capacity" name="capacity" required>
+      </div>
+      <div class="form-group">
+        <label for="busname">Bus name:</label>
+        <input type="string" class="form-control" id="busname" [(ngModel)]="busData.busname" name="busname" required>
+      </div>
+      <div class="form-group">
+        <label for="start">Bus Starting Place:</label>
+        <input type="string" class="form-control" id="start" [(ngModel)]="busData.start" name="start" required>
+      </div>
+      <div class="form-group">
+        <label for="end">Bus Ending Place:</label>
+        <input type="string" class="form-control" id="end" [(ngModel)]="busData.end" name="end" required>
+      </div>
+      <div class="form-group">
+        <label for="date">Bus Date:</label>
+        <input type="datetime-local" class="form-control" id="date" [(ngModel)]="busData.date" name="date" required>
+      </div>
+      <br>
+      <button type="submit" class="btn btn-primary">Add Bus</button>
+    </form>
+  </div>
+</div></div>
+
+=== D:/Angular/hello-world/src/app\add-bus\add-bus.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { AddBusComponent } from './add-bus.component';
+
+describe('AddBusComponent', () => {
+  let component: AddBusComponent;
+  let fixture: ComponentFixture<AddBusComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [AddBusComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(AddBusComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\add-bus\add-bus.component.ts ===
+ 
+import { Component } from '@angular/core';
+import { BusService } from '../bus.service';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-add-bus',
+  templateUrl: './add-bus.component.html',
+  styleUrls: ['./add-bus.component.css','../../assets/bootstrap.min.css']
+})
+export class AddBusComponent {
+  busData: any = {
+   };
+
+  constructor(private busService: BusService) { }
+
+  addBus(): void {
+    this.busService.createBus(this.busData).subscribe(
+      (response) => {
+         console.log('Bus created successfully:', response);
+         this.busData = {};
+      },
+      (error) => {
+         console.error('Error creating bus:', error);
+      }
+    );
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\admin\admin.component.css ===
+#body {
+    background: linear-gradient(135deg, #00aaff, #ff00aa); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    width: 80%; 
+    max-width: 500px; 
+    background-color: white;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+
+  }
+  .card:hover {
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-custom {
+    margin-top: 10px;
+  }
+  .btn-add-bus {
+    background-color: #28a745; 
+    border-color: #28a745;
+  }
+  .btn-delete-bus {
+    background-color: #dc3545; 
+    border-color: #dc3545;
+  }
+  .btn-display-bus {
+    background-color: #007bff; 
+    border-color: #007bff;
+  }
+
+
+=== D:/Angular/hello-world/src/app\admin\admin.component.html ===
+<div id="body">
+<div class="container" >
+    <div class="card">
+      <h2 class="text-center mb-4">Admin Panel</h2>
+      <button routerLink="/addbus" type="button" class="btn btn-primary btn-block btn-custom btn-add-bus">Add Journey</button>
+  
+      <button type="button" routerLink="/editbus" class="btn btn-primary btn-block btn-custom btn-delete-bus">Edit Journey</button>
+
+      <button type="button" routerLink="/showbus" class="btn btn-primary btn-block btn-custom btn-display-bus">View Journeys</button>
+      <button type="button" routerLink="/reserves" class="btn btn-primary btn-block btn-custom btn-display-bus">View all reservations</button>
+    </div>
+  </div>
+</div>
+
+=== D:/Angular/hello-world/src/app\admin\admin.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { AdminComponent } from './admin.component';
+
+describe('AdminComponent', () => {
+  let component: AdminComponent;
+  let fixture: ComponentFixture<AdminComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [AdminComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(AdminComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\admin\admin.component.ts ===
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+@Component({
+  selector: 'app-admin',
+  templateUrl: './admin.component.html',
+  styleUrls: ['./admin.component.css','../../assets/bootstrap.min.css']
+})
+export class AdminComponent {
+
+}
+
+
+=== D:/Angular/hello-world/src/app\book-bus\book-bus.component.css ===
+.container {
+  width: 50%; /* Adjust width as needed */
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+p {
+  font-weight: bold;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+ul {
+  list-style-type: none;
+}
+
+li {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.errormsg {
+  color: red;
+  font-weight: bold;
+}
+
+
+=== D:/Angular/hello-world/src/app\book-bus\book-bus.component.html ===
+
+<div class="container">
+<h1>Book your Bus!</h1>
+<p>Enter Your Destination: </p>
+<input type="text" [(ngModel)]="dest" />
+
+<button (click)="search()">Search for buses</button>
+{{success}}
+<ul *ngIf="reqbuses.length>0">
+<li *ngFor="let bus of reqbuses">
+Bus Name: {{bus.busname}}
+Bus Number: {{bus.busNumber}}
+Bus Starting Place: {{bus.start}}
+Bus Ending Place: {{bus.end}}
+Bus Capacity: {{bus.capacity}}
+Bus Departure Date: {{bus.date}}
+</li>
+<p>Enter Preferred Bus Number: </p>
+<input type="text" [(ngModel)]="Preferred" required/>
+<button (click)="addReservation()">Reserve</button>
+{{errormsg}}
+</ul>
+<div *ngIf="reqbuses.length==0">
+    <p>No buses found</p>
+</div>
+</div>
+
+=== D:/Angular/hello-world/src/app\book-bus\book-bus.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { BookBusComponent } from './book-bus.component';
+
+describe('BookBusComponent', () => {
+  let component: BookBusComponent;
+  let fixture: ComponentFixture<BookBusComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [BookBusComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(BookBusComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\book-bus\book-bus.component.ts ===
+import { Component } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+import { BusService } from '../bus.service';
+
+@Component({
+  selector: 'app-book-bus',
+  templateUrl: './book-bus.component.html',
+  styleUrls: ['./book-bus.component.css','../../assets/bootstrap.min.css']
+})
+export class BookBusComponent {
+  constructor(private authService: AuthService,private router:Router, public busService:BusService) {}
+  buses:any[] = [];
+
+  ngOnInit(): void {
+    if (!this.authService.isLoggedIn()) {
+      console.log("You do not have acces to this page(403)")
+      this.authService.logout(); 
+      window.location.href = '/login';
+    }
+    this.fetchBuses();
+
+
+  }
+  reqbuses:any[]=[];
+  dest:string=""
+  Preferred:number=0;
+  i:number=0;
+  errormsg:string=""
+  success:string=""
+  search(){
+       for (this.i=0;this.i<this.buses.length;this.i++){
+          
+          let bus1=this.buses[this.i]
+          if (bus1.end==this.dest){
+              this.reqbuses.push(bus1)
+          }
+       }
+       console.log(this.reqbuses)
+  }
+  fetchBuses(): void {
+    this.busService.getBuses().subscribe(
+      (buses) => {
+        this.buses = buses;
+      },
+      (error) => {
+        console.error('Error fetching buses:', error);
+      }
+    );
+  }
+
+  addReservation(): void {
+    
+    let busData={busNumber: this.buses.find((value)=>{
+      if(value.busNumber===this.Preferred){
+        return value;
+      }
+    }).busNumber,
+      name:sessionStorage.getItem("name"),
+      username:sessionStorage.getItem("uid"),
+      busname:this.buses.find((value)=>{
+        if(value.busNumber===this.Preferred){
+          return value;
+        }
+      }).busname,
+      date:this.buses.find((value)=>{
+        if(value.busNumber===this.Preferred){
+          return value;
+        }
+      }).date,
+     start:this.buses.find((value)=>{
+      if(value.busNumber===this.Preferred){
+        return value;
+      }
+    }).start,
+     end:this.buses.find((value)=>{
+      if(value.busNumber===this.Preferred){
+        return value;
+      }
+    }).end,
+     gender:sessionStorage.getItem("gender"),
+     phone:sessionStorage.getItem("phone")}
+    
+    this.busService.reserveBus(busData).subscribe(
+      (response) => {
+         console.log('Bus created successfully:', response);
+        this.dest=""
+        this.Preferred=0;
+        this.i=0
+        this.errormsg=""
+        this.success="Succesfully Registered"
+        this.reqbuses=[]
+      },
+      (error) => {
+         console.error('Error creating bus:', error);
+        this.errormsg=error.message
+      }
+    );
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\bus-list\bus-list.component.css ===
+#body {
+    background: linear-gradient(135deg, #00aaff, #ff00aa); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    width: 80%; 
+    max-width: 500px;
+    background-color: white;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  .bus-list-container {
+    height: 500px; 
+    overflow-y: auto;
+  }
+
+=== D:/Angular/hello-world/src/app\bus-list\bus-list.component.html ===
+<div id="body">
+  <div class="container">
+    <div class="card">
+      <h2 class="text-center mb-4">Available Journeys</h2>
+      <div class="bus-list-container">
+        <div class='bus-list' *ngFor="let bus of buses">
+          <div class='bus-item'>
+            <div class="card">
+          <p>Bus Number: {{ bus.busNumber }}</p>
+    <p>Bus Capacity: {{ bus.capacity }}</p>
+    <p>Bus Name: {{ bus.busname }}</p>
+    <p>Bus Start: {{ bus.start }}</p>
+    <p>Bus End: {{ bus.end }}</p>
+    <p>Bus Date: {{ bus.date }}</p>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+=== D:/Angular/hello-world/src/app\bus-list\bus-list.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { BusListComponent } from './bus-list.component';
+
+describe('BusListComponent', () => {
+  let component: BusListComponent;
+  let fixture: ComponentFixture<BusListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [BusListComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(BusListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\bus-list\bus-list.component.ts ===
+// bus-list.component.ts
+
+import { Component, OnInit } from '@angular/core';
+import { BusService } from '../bus.service';
+
+@Component({
+  selector: 'app-bus-list',
+  templateUrl: './bus-list.component.html',
+  styleUrls: ['./bus-list.component.css','../../assets/bootstrap.min.css']
+})
+export class BusListComponent implements OnInit {
+  buses:any[] = [];
+
+  constructor(private busService: BusService) { }
+
+  ngOnInit(): void {
+    this.fetchBuses();
+  }
+
+  fetchBuses(): void {
+    this.busService.getBuses().subscribe(
+      (buses) => {
+        this.buses = buses;
+      },
+      (error) => {
+        console.error('Error fetching buses:', error);
+      }
+    );
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\deletebus\deletebus.component.css ===
+
+
+=== D:/Angular/hello-world/src/app\deletebus\deletebus.component.html ===
+<div class="container">
+    <h2>Edit Bus</h2>
+   
+      <div class="form-group">
+        <label for="busNumber">Bus Number:</label>
+        <input type="text" class="form-control" id="busNumber" [(ngModel)]="busData.busNumber" name="busNumber" required>
+        <button (click)="search()">Delete</button>  
+    </div></div>
+
+
+=== D:/Angular/hello-world/src/app\deletebus\deletebus.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DeletebusComponent } from './deletebus.component';
+
+describe('DeletebusComponent', () => {
+  let component: DeletebusComponent;
+  let fixture: ComponentFixture<DeletebusComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [DeletebusComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(DeletebusComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\deletebus\deletebus.component.ts ===
+import { Component } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { BusService } from '../bus.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-deletebus',
+  templateUrl: './deletebus.component.html',
+  styleUrl: './deletebus.component.css'
+})
+export class DeletebusComponent {
+  busData: any = {
+    // Initialize bus data object with default values
+  };
+  buses:any[] = [];
+  constructor(private authService: AuthService,private router:Router, public busService:BusService) {}
+
+  ngOnInit(): void {
+    if (!this.authService.isLoggedIn()) {
+      console.log("You do not have acces to this page(403)")
+      this.authService.logout(); 
+      window.location.href = '/login';
+    }
+    this.fetchBuses();
+
+
+  }
+  reqbuses:any[]=[];
+  dest:string=""
+  Preferred:number=0;
+  i:number=0;
+  errormsg:string=""
+  success:string=""
+  fetchBuses(): void {
+    this.busService.getBuses().subscribe(
+      (buses) => {
+        this.buses = buses;
+      },
+      (error) => {
+        console.error('Error fetching buses:', error);
+      }
+    );
+   
+  }
+  
+  search(){
+    for (this.i=0;this.i<this.buses.length;this.i++){
+       
+       let bus1=this.buses[this.i]
+       if (bus1.busNumber==this.busData.busNumber){
+           this.reqbuses.push(bus1)
+       }
+    }
+    this.busData=this.reqbuses[0]
+    console.log(this.reqbuses)
+}
+}
+
+
+=== D:/Angular/hello-world/src/app\editbus\editbus.component.css ===
+.container {
+    width: 50%; /* Adjust width as needed */
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    font-weight: bold;
+  }
+  
+  input[type="text"],
+  input[type="number"],
+  input[type="datetime-local"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+  
+
+=== D:/Angular/hello-world/src/app\editbus\editbus.component.html ===
+<!-- add-bus.component.html -->
+
+<div class="container">
+    <h2>Edit Bus</h2>
+   
+      <div class="form-group">
+        <label for="busNumber">Bus Number:</label>
+        <input type="text" class="form-control" id="busNumber" [(ngModel)]="busData.busNumber" name="busNumber" required>
+        <button (click)="search()">Search</button>  
+    </div>
+      <div *ngIf="reqbuses.length>0">
+        <form (ngSubmit)="editBus()">
+      <div class="form-group">
+        <label for="capacity">Capacity:</label>
+        <input type="number" class="form-control" id="capacity" [(ngModel)]="busData.capacity" name="capacity" required>
+      </div>
+      <div class="form-group">
+        <label for="busname">Bus name:</label>
+        <input type="string" class="form-control" id="busname" [(ngModel)]="busData.busname" name="busname" required>
+      </div>
+      <div class="form-group">
+        <label for="start">Bus Starting Place:</label>
+        <input type="string" class="form-control" id="start" [(ngModel)]="busData.start" name="start" required>
+      </div>
+      <div class="form-group">
+        <label for="end">Bus Ending Place:</label>
+        <input type="string" class="form-control" id="end" [(ngModel)]="busData.end" name="end" required>
+      </div>
+      <div class="form-group">
+        <label for="date">Bus Date:</label>
+        <input type="datetime-local" class="form-control" id="date" [(ngModel)]="busData.date" name="date" required>
+      </div>
+      <!-- Add more fields as needed -->
+      <button type="submit" class="btn btn-primary">Add Bus</button>
+     
+    </form> </div>
+  </div>
+  
+
+=== D:/Angular/hello-world/src/app\editbus\editbus.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { EditbusComponent } from './editbus.component';
+
+describe('EditbusComponent', () => {
+  let component: EditbusComponent;
+  let fixture: ComponentFixture<EditbusComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [EditbusComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(EditbusComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\editbus\editbus.component.ts ===
+import { Component } from '@angular/core';
+import { BusService } from '../bus.service';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-editbus',
+  templateUrl: './editbus.component.html',
+  styleUrl: './editbus.component.css'
+})
+export class EditbusComponent {
+  busData: any = {
+   };
+  buses:any[] = [];
+  constructor(private authService: AuthService,private router:Router, public busService:BusService) {}
+
+  ngOnInit(): void {
+    if (!this.authService.isLoggedIn()) {
+      console.log("You do not have acces to this page(403)")
+      this.authService.logout(); 
+      window.location.href = '/login';
+    }
+    this.fetchBuses();
+
+
+  }
+  reqbuses:any[]=[];
+  dest:string=""
+  Preferred:number=0;
+  i:number=0;
+  errormsg:string=""
+  success:string=""
+  fetchBuses(): void {
+    this.busService.getBuses().subscribe(
+      (buses) => {
+        this.buses = buses;
+      },
+      (error) => {
+        console.error('Error fetching buses:', error);
+      }
+    );
+   
+  }
+  id:string=""
+  editBus(): void {
+    this.id=this.reqbuses[0].busNumber;
+    this.busService.updateBus(this.id,this.busData).subscribe(
+      (response) => {
+         console.log('Bus edited successfully:', response);
+         this.busData = {};
+        this.dest=""
+        this.Preferred=0;
+        this.i=0
+        this.errormsg=""
+        this.success="Succesfully Registered"
+        this.reqbuses=[]
+      },
+      (error) => {
+        // Handle bus creation error
+        console.error('Error creating bus:', error);
+        this.dest=""
+        this.Preferred=0;
+        this.i=0
+        this.errormsg=""
+        this.success="Error"
+        this.reqbuses=[]
+      }
+    );
+  }
+  search(){
+    for (this.i=0;this.i<this.buses.length;this.i++){
+       
+       let bus1=this.buses[this.i]
+       if (bus1.busNumber==this.busData.busNumber){
+           this.reqbuses.push(bus1)
+       }
+    }
+    this.busData=this.reqbuses[0]
+    console.log(this.reqbuses)
+}
+}
+
+
+=== D:/Angular/hello-world/src/app\home\home.component.css ===
+/**
+Bootstrap v5.3.1
+* Author: BootstrapMade.com
+* License: https://bootstrapmade.com/license/
+*/
+
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+*{
+  font-family: 'Poppins';
+}
+body {
+  font-family: "Open Sans", sans-serif;
+  color: #444444;
+}
+
+a {
+  color: #47b2e4;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #73c5eb;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Jost", sans-serif;
+}
+
+/*--------------------------------------------------------------
+# Preloader
+--------------------------------------------------------------*/
+#preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  overflow: hidden;
+  background: #37517e;
+}
+
+#preloader:before {
+  content: "";
+  position: fixed;
+  top: calc(50% - 30px);
+  left: calc(50% - 30px);
+  border: 6px solid #37517e;
+  border-top-color: #fff;
+  border-bottom-color: #fff;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: animate-preloader 1s linear infinite;
+}
+
+@keyframes animate-preloader {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/*--------------------------------------------------------------
+# Back to top button
+--------------------------------------------------------------*/
+.back-to-top {
+  position: fixed;
+  visibility: hidden;
+  opacity: 0;
+  right: 15px;
+  bottom: 15px;
+  z-index: 996;
+  background: #47b2e4;
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+  transition: all 0.4s;
+}
+
+.back-to-top i {
+  font-size: 24px;
+  color: #fff;
+  line-height: 0;
+}
+
+.back-to-top:hover {
+  background: #6bc1e9;
+  color: #fff;
+}
+
+.back-to-top.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+/*--------------------------------------------------------------
+# Header
+--------------------------------------------------------------*/
+#header {
+  transition: all 0.5s;
+  z-index: 997;
+  padding: 15px 0;
+}
+
+#header.header-scrolled,
+#header.header-inner-pages {
+  background: rgba(40, 58, 90, 0.9);
+}
+
+#header .logo {
+  font-size: 30px;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+#header .logo a {
+  color: #fff;
+}
+
+#header .logo img {
+  max-height: 40px;
+}
+
+/*--------------------------------------------------------------
+# Navigation Menu
+--------------------------------------------------------------*/
+/**
+* Desktop Navigation 
+*/
+.navbar {
+  padding: 0;
+}
+
+.navbar ul {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  list-style: none;
+  align-items: center;
+}
+
+.navbar li {
+  position: relative;
+}
+
+.navbar a,
+.navbar a:focus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0 10px 30px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  transition: 0.3s;
+}
+
+.navbar a i,
+.navbar a:focus i {
+  font-size: 12px;
+  line-height: 0;
+  margin-left: 5px;
+}
+
+.navbar a:hover,
+.navbar .active,
+.navbar .active:focus,
+.navbar li:hover>a {
+  color: #47b2e4;
+}
+
+.navbar .getstarted,
+.navbar .getstarted:focus {
+  padding: 8px 20px;
+  margin-left: 30px;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 14px;
+  border: 2px solid #47b2e4;
+  font-weight: 600;
+}
+
+.navbar .getstarted:hover,
+.navbar .getstarted:focus:hover {
+  color: #fff;
+  background: #31a9e1;
+}
+
+.navbar .dropdown ul {
+  display: block;
+  position: absolute;
+  left: 14px;
+  top: calc(100% + 30px);
+  margin: 0;
+  padding: 10px 0;
+  z-index: 99;
+  opacity: 0;
+  visibility: hidden;
+  background: #fff;
+  box-shadow: 0px 0px 30px rgba(127, 137, 161, 0.25);
+  transition: 0.3s;
+  border-radius: 4px;
+}
+
+.navbar .dropdown ul li {
+  min-width: 200px;
+}
+
+.navbar .dropdown ul a {
+  padding: 10px 20px;
+  font-size: 14px;
+  text-transform: none;
+  font-weight: 500;
+  color: #0c3c53;
+}
+
+.navbar .dropdown ul a i {
+  font-size: 12px;
+}
+
+.navbar .dropdown ul a:hover,
+.navbar .dropdown ul .active:hover,
+.navbar .dropdown ul li:hover>a {
+  color: #47b2e4;
+}
+
+.navbar .dropdown:hover>ul {
+  opacity: 1;
+  top: 100%;
+  visibility: visible;
+}
+
+.navbar .dropdown .dropdown ul {
+  top: 0;
+  left: calc(100% - 30px);
+  visibility: hidden;
+}
+
+.navbar .dropdown .dropdown:hover>ul {
+  opacity: 1;
+  top: 0;
+  left: 100%;
+  visibility: visible;
+}
+
+@media (max-width: 1366px) {
+  .navbar .dropdown .dropdown ul {
+    left: -90%;
+  }
+
+  .navbar .dropdown .dropdown:hover>ul {
+    left: -100%;
+  }
+}
+
+/**
+* Mobile Navigation 
+*/
+.mobile-nav-toggle {
+  color: #fff;
+  font-size: 28px;
+  cursor: pointer;
+  display: none;
+  line-height: 0;
+  transition: 0.5s;
+}
+
+.mobile-nav-toggle.bi-x {
+  color: #fff;
+}
+
+@media (max-width: 991px) {
+  .mobile-nav-toggle {
+    display: block;
+  }
+
+  .navbar ul {
+    display: none;
+  }
+}
+
+.navbar-mobile {
+  position: fixed;
+  overflow: hidden;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(40, 58, 90, 0.9);
+  transition: 0.3s;
+  z-index: 999;
+}
+
+.navbar-mobile .mobile-nav-toggle {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.navbar-mobile ul {
+  display: block;
+  position: absolute;
+  top: 55px;
+  right: 15px;
+  bottom: 15px;
+  left: 15px;
+  padding: 10px 0;
+  border-radius: 10px;
+  background-color: #fff;
+  overflow-y: auto;
+  transition: 0.3s;
+}
+
+.navbar-mobile a,
+.navbar-mobile a:focus {
+  padding: 10px 20px;
+  font-size: 15px;
+  color: #37517e;
+}
+
+.navbar-mobile a:hover,
+.navbar-mobile .active,
+.navbar-mobile li:hover>a {
+  color: #47b2e4;
+}
+
+.navbar-mobile .getstarted,
+.navbar-mobile .getstarted:focus {
+  margin: 15px;
+  color: #37517e;
+}
+
+.navbar-mobile .dropdown ul {
+  position: static;
+  display: none;
+  margin: 10px 20px;
+  padding: 10px 0;
+  z-index: 99;
+  opacity: 1;
+  visibility: visible;
+  background: #fff;
+  box-shadow: 0px 0px 30px rgba(127, 137, 161, 0.25);
+}
+
+.navbar-mobile .dropdown ul li {
+  min-width: 200px;
+}
+
+.navbar-mobile .dropdown ul a {
+  padding: 10px 20px;
+}
+
+.navbar-mobile .dropdown ul a i {
+  font-size: 12px;
+}
+
+.navbar-mobile .dropdown ul a:hover,
+.navbar-mobile .dropdown ul .active:hover,
+.navbar-mobile .dropdown ul li:hover>a {
+  color: #47b2e4;
+}
+
+.navbar-mobile .dropdown>.dropdown-active {
+  display: block;
+  visibility: visible !important;
+}
+
+/*--------------------------------------------------------------
+# Hero Section
+--------------------------------------------------------------*/
+#hero {
+  width: 100%;
+  height: 80vh;
+  background: #37517e;
+}
+
+#hero .container {
+  padding-top: 72px;
+}
+
+#hero h1 {
+  margin: 0 0 10px 0;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 56px;
+  color: #fff;
+}
+
+#hero h2 {
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 50px;
+  font-size: 24px;
+}
+
+#hero .btn-get-started {
+  font-family: "Jost", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 10px 28px 11px 28px;
+  border-radius: 50px;
+  transition: 0.5s;
+  margin: 10px 0 0 0;
+  color: #fff;
+  background: #47b2e4;
+}
+
+#hero .btn-get-started:hover {
+  background: #209dd8;
+}
+
+#hero .btn-watch-video {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  transition: 0.5s;
+  margin: 10px 0 0 25px;
+  color: #fff;
+  line-height: 1;
+}
+
+#hero .btn-watch-video i {
+  line-height: 0;
+  color: #fff;
+  font-size: 32px;
+  transition: 0.3s;
+  margin-right: 8px;
+}
+
+#hero .btn-watch-video:hover i {
+  color: #47b2e4;
+}
+
+#hero .animated {
+  animation: up-down 2s ease-in-out infinite alternate-reverse both;
+}
+
+@media (max-width: 991px) {
+  #hero {
+    height: 100vh;
+    text-align: center;
+  }
+
+  #hero .animated {
+    animation: none;
+  }
+
+  #hero .hero-img {
+    text-align: center;
+  }
+
+  #hero .hero-img img {
+    width: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  #hero h1 {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  #hero h2 {
+    font-size: 18px;
+    line-height: 24px;
+    margin-bottom: 30px;
+  }
+
+  #hero .hero-img img {
+    width: 70%;
+  }
+}
+
+@media (max-width: 575px) {
+  #hero .hero-img img {
+    width: 80%;
+  }
+
+  #hero .btn-get-started {
+    font-size: 16px;
+    padding: 10px 24px 11px 24px;
+  }
+}
+
+@keyframes up-down {
+  0% {
+    transform: translateY(10px);
+  }
+
+  100% {
+    transform: translateY(-10px);
+  }
+}
+
+/*--------------------------------------------------------------
+# Sections General
+--------------------------------------------------------------*/
+section {
+  padding: 60px 0;
+  overflow: hidden;
+}
+
+.section-bg {
+  background-color: #f3f5fa;
+}
+
+.section-title {
+  text-align: center;
+  padding-bottom: 30px;
+}
+
+.section-title h2 {
+  font-size: 32px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  position: relative;
+  color: #37517e;
+}
+
+.section-title h2::before {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 120px;
+  height: 1px;
+  background: #ddd;
+  bottom: 1px;
+  left: calc(50% - 60px);
+}
+
+.section-title h2::after {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 40px;
+  height: 3px;
+  background: #47b2e4;
+  bottom: 0;
+  left: calc(50% - 20px);
+}
+
+.section-title p {
+  margin-bottom: 0;
+}
+
+/*--------------------------------------------------------------
+# Clients
+--------------------------------------------------------------*/
+.clients {
+  padding: 12px 0;
+  text-align: center;
+}
+
+.clients img {
+  max-width: 45%;
+  transition: all 0.4s ease-in-out;
+  display: inline-block;
+  padding: 15px 0;
+  filter: grayscale(100);
+}
+
+.clients img:hover {
+  filter: none;
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .clients img {
+    max-width: 40%;
+  }
+}
+
+/*--------------------------------------------------------------
+# About Us
+--------------------------------------------------------------*/
+.about .content h3 {
+  font-weight: 600;
+  font-size: 26px;
+}
+
+.about .content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.about .content ul li {
+  padding-left: 28px;
+  position: relative;
+}
+
+.about .content ul li+li {
+  margin-top: 10px;
+}
+
+.about .content ul i {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  font-size: 20px;
+  color: #47b2e4;
+  line-height: 1;
+}
+
+.about .content p:last-child {
+  margin-bottom: 0;
+}
+
+.about .content .btn-learn-more {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 12px 32px;
+  border-radius: 4px;
+  transition: 0.3s;
+  line-height: 1;
+  color: #47b2e4;
+  animation-delay: 0.8s;
+  margin-top: 6px;
+  border: 2px solid #47b2e4;
+}
+
+.about .content .btn-learn-more:hover {
+  background: #47b2e4;
+  color: #fff;
+  text-decoration: none;
+}
+
+/*--------------------------------------------------------------
+# Why Us
+--------------------------------------------------------------*/
+.why-us .content {
+  padding: 60px 100px 0 100px;
+}
+
+.why-us .content h3 {
+  font-weight: 400;
+  font-size: 34px;
+  color: #37517e;
+}
+
+.why-us .content h4 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.why-us .content p {
+  font-size: 15px;
+  color: #848484;
+}
+
+.why-us .img {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.why-us .accordion-list {
+  padding: 0 100px 60px 100px;
+}
+
+.why-us .accordion-list ul {
+  padding: 0;
+  list-style: none;
+}
+
+.why-us .accordion-list li+li {
+  margin-top: 15px;
+}
+
+.why-us .accordion-list li {
+  padding: 20px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.why-us .accordion-list a {
+  display: block;
+  position: relative;
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  padding-right: 30px;
+  outline: none;
+  cursor: pointer;
+}
+
+.why-us .accordion-list span {
+  color: #47b2e4;
+  font-weight: 600;
+  font-size: 18px;
+  padding-right: 10px;
+}
+
+.why-us .accordion-list i {
+  font-size: 24px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.why-us .accordion-list p {
+  margin-bottom: 0;
+  padding: 10px 0 0 0;
+}
+
+.why-us .accordion-list .icon-show {
+  display: none;
+}
+
+.why-us .accordion-list a.collapsed {
+  color: #343a40;
+}
+
+.why-us .accordion-list a.collapsed:hover {
+  color: #47b2e4;
+}
+
+.why-us .accordion-list a.collapsed .icon-show {
+  display: inline-block;
+}
+
+.why-us .accordion-list a.collapsed .icon-close {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+
+  .why-us .content,
+  .why-us .accordion-list {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 992px) {
+  .why-us .img {
+    min-height: 400px;
+  }
+
+  .why-us .content {
+    padding-top: 30px;
+  }
+
+  .why-us .accordion-list {
+    padding-bottom: 30px;
+  }
+}
+
+@media (max-width: 575px) {
+  .why-us .img {
+    min-height: 200px;
+  }
+}
+
+/*--------------------------------------------------------------
+# Skills
+--------------------------------------------------------------*/
+.skills .content h3 {
+  font-weight: 700;
+  font-size: 32px;
+  color: #37517e;
+  font-family: "Poppins", sans-serif;
+}
+
+.skills .content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.skills .content ul li {
+  padding-bottom: 10px;
+}
+
+.skills .content ul i {
+  font-size: 20px;
+  padding-right: 4px;
+  color: #47b2e4;
+}
+
+.skills .content p:last-child {
+  margin-bottom: 0;
+}
+
+.skills .progress {
+  height: 60px;
+  display: block;
+  background: none;
+  border-radius: 0;
+}
+
+.skills .progress .skill {
+  padding: 0;
+  margin: 0 0 6px 0;
+  text-transform: uppercase;
+  display: block;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  color: #37517e;
+}
+
+.skills .progress .skill .val {
+  float: right;
+  font-style: normal;
+}
+
+.skills .progress-bar-wrap {
+  background: #e8edf5;
+  height: 10px;
+}
+
+.skills .progress-bar {
+  width: 1px;
+  height: 10px;
+  transition: 0.9s;
+  background-color: #4668a2;
+}
+
+/*--------------------------------------------------------------
+# Services
+--------------------------------------------------------------*/
+.services .icon-box {
+  box-shadow: 0px 0 25px 0 rgba(0, 0, 0, 0.1);
+  padding: 50px 30px;
+  transition: all ease-in-out 0.4s;
+  background: #fff;
+}
+
+.services .icon-box .icon {
+  margin-bottom: 10px;
+}
+
+.services .icon-box .icon i {
+  color: #47b2e4;
+  font-size: 36px;
+  transition: 0.3s;
+}
+
+.services .icon-box h4 {
+  font-weight: 500;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.services .icon-box h4 a {
+  color: #37517e;
+  transition: ease-in-out 0.3s;
+}
+
+.services .icon-box p {
+  line-height: 24px;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.services .icon-box:hover {
+  transform: translateY(-10px);
+}
+
+.services .icon-box:hover h4 a {
+  color: #47b2e4;
+}
+
+/*--------------------------------------------------------------
+# Cta
+--------------------------------------------------------------*/
+.cta {
+  background: linear-gradient(rgba(40, 58, 90, 0.9), rgba(40, 58, 90, 0.9)) fixed center center;
+  background-size: cover;
+  padding: 120px 0;
+}
+
+.cta h3 {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.cta p {
+  color: #fff;
+}
+
+.cta .cta-btn {
+  font-family: "Jost", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 1px;
+  display: inline-block;
+  padding: 12px 40px;
+  border-radius: 50px;
+  transition: 0.5s;
+  margin: 10px;
+  border: 2px solid #fff;
+  color: #fff;
+}
+
+.cta .cta-btn:hover {
+  background: #47b2e4;
+  border: 2px solid #47b2e4;
+}
+
+@media (max-width: 1024px) {
+  .cta {
+    background-attachment: scroll;
+  }
+}
+
+@media (min-width: 769px) {
+  .cta .cta-btn-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}
+
+/*--------------------------------------------------------------
+# Portfolio
+--------------------------------------------------------------*/
+.portfolio #portfolio-flters {
+  list-style: none;
+  margin-bottom: 20px;
+}
+
+.portfolio #portfolio-flters li {
+  cursor: pointer;
+  display: inline-block;
+  margin: 10px 5px;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  color: #444444;
+  transition: all 0.3s;
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-family: "Poppins", sans-serif;
+}
+
+.portfolio #portfolio-flters li:hover,
+.portfolio #portfolio-flters li.filter-active {
+  background: #47b2e4;
+  color: #fff;
+}
+
+.portfolio .portfolio-item {
+  margin-bottom: 30px;
+}
+
+.portfolio .portfolio-item .portfolio-img {
+  overflow: hidden;
+}
+
+.portfolio .portfolio-item .portfolio-img img {
+  transition: all 0.6s;
+}
+
+.portfolio .portfolio-item .portfolio-info {
+  opacity: 0;
+  position: absolute;
+  left: 15px;
+  bottom: 0;
+  z-index: 3;
+  right: 15px;
+  transition: all 0.3s;
+  background: rgba(55, 81, 126, 0.8);
+  padding: 10px 15px;
+}
+
+.portfolio .portfolio-item .portfolio-info h4 {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0px;
+}
+
+.portfolio .portfolio-item .portfolio-info p {
+  color: #f9fcfe;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.portfolio .portfolio-item .portfolio-info .preview-link,
+.portfolio .portfolio-item .portfolio-info .details-link {
+  position: absolute;
+  right: 40px;
+  font-size: 24px;
+  top: calc(50% - 18px);
+  color: #fff;
+  transition: 0.3s;
+}
+
+.portfolio .portfolio-item .portfolio-info .preview-link:hover,
+.portfolio .portfolio-item .portfolio-info .details-link:hover {
+  color: #47b2e4;
+}
+
+.portfolio .portfolio-item .portfolio-info .details-link {
+  right: 10px;
+}
+
+.portfolio .portfolio-item:hover .portfolio-img img {
+  transform: scale(1.15);
+}
+
+.portfolio .portfolio-item:hover .portfolio-info {
+  opacity: 1;
+}
+
+/*--------------------------------------------------------------
+# Portfolio Details
+--------------------------------------------------------------*/
+.portfolio-details {
+  padding-top: 40px;
+}
+
+.portfolio-details .portfolio-details-slider img {
+  width: 100%;
+}
+
+.portfolio-details .portfolio-details-slider .swiper-pagination {
+  margin-top: 20px;
+  position: relative;
+}
+
+.portfolio-details .portfolio-details-slider .swiper-pagination .swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  opacity: 1;
+  border: 1px solid #47b2e4;
+}
+
+.portfolio-details .portfolio-details-slider .swiper-pagination .swiper-pagination-bullet-active {
+  background-color: #47b2e4;
+}
+
+.portfolio-details .portfolio-info {
+  padding: 30px;
+  box-shadow: 0px 0 30px rgba(55, 81, 126, 0.08);
+}
+
+.portfolio-details .portfolio-info h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.portfolio-details .portfolio-info ul {
+  list-style: none;
+  padding: 0;
+  font-size: 15px;
+}
+
+.portfolio-details .portfolio-info ul li+li {
+  margin-top: 10px;
+}
+
+.portfolio-details .portfolio-description {
+  padding-top: 30px;
+}
+
+.portfolio-details .portfolio-description h2 {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.portfolio-details .portfolio-description p {
+  padding: 0;
+}
+
+/*--------------------------------------------------------------
+# Team
+--------------------------------------------------------------*/
+.team .member {
+  position: relative;
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  border-radius: 5px;
+  background: #fff;
+  transition: 0.5s;
+  height: 100%;
+}
+
+.team .member .pic {
+  overflow: hidden;
+  width: 180px;
+  border-radius: 50%;
+}
+
+.team .member .pic img {
+  transition: ease-in-out 0.3s;
+}
+
+.team .member:hover {
+  transform: translateY(-10px);
+}
+
+.team .member .member-info {
+  padding-left: 30px;
+}
+
+.team .member h4 {
+  font-weight: 700;
+  margin-bottom: 5px;
+  font-size: 20px;
+  color: #37517e;
+}
+
+.team .member span {
+  display: block;
+  font-size: 15px;
+  padding-bottom: 10px;
+  position: relative;
+  font-weight: 500;
+}
+
+.team .member span::after {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 50px;
+  height: 1px;
+  background: #cbd6e9;
+  bottom: 0;
+  left: 0;
+}
+
+.team .member p {
+  margin: 10px 0 0 0;
+  font-size: 14px;
+}
+
+.team .member .social {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.team .member .social a {
+  transition: ease-in-out 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+  width: 32px;
+  height: 32px;
+  background: #eff2f8;
+}
+
+.team .member .social a i {
+  color: #37517e;
+  font-size: 16px;
+  margin: 0 2px;
+}
+
+.team .member .social a:hover {
+  background: #47b2e4;
+}
+
+.team .member .social a:hover i {
+  color: #fff;
+}
+
+.team .member .social a+a {
+  margin-left: 8px;
+}
+
+/*--------------------------------------------------------------
+# Pricing
+--------------------------------------------------------------*/
+.pricing .row {
+  padding-top: 40px;
+}
+
+.pricing .box {
+  padding: 60px 40px;
+  box-shadow: 0 3px 20px -2px rgba(20, 45, 100, 0.1);
+  background: #fff;
+  height: 100%;
+  border-top: 4px solid #fff;
+  border-radius: 5px;
+}
+
+.pricing h3 {
+  font-weight: 500;
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #37517e;
+}
+
+.pricing h4 {
+  font-size: 48px;
+  color: #37517e;
+  font-weight: 400;
+  font-family: "Jost", sans-serif;
+  margin-bottom: 25px;
+}
+
+.pricing h4 sup {
+  font-size: 28px;
+}
+
+.pricing h4 span {
+  color: #47b2e4;
+  font-size: 18px;
+  display: block;
+}
+
+.pricing ul {
+  padding: 20px 0;
+  list-style: none;
+  color: #999;
+  text-align: left;
+  line-height: 20px;
+}
+
+.pricing ul li {
+  padding: 10px 0 10px 30px;
+  position: relative;
+}
+
+.pricing ul i {
+  color: #28a745;
+  font-size: 24px;
+  position: absolute;
+  left: 0;
+  top: 6px;
+}
+
+.pricing ul .na {
+  color: #ccc;
+}
+
+.pricing ul .na i {
+  color: #ccc;
+}
+
+.pricing ul .na span {
+  text-decoration: line-through;
+}
+
+.pricing .buy-btn {
+  display: inline-block;
+  padding: 12px 35px;
+  border-radius: 50px;
+  color: #47b2e4;
+  transition: none;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Jost", sans-serif;
+  transition: 0.3s;
+  border: 1px solid #47b2e4;
+}
+
+.pricing .buy-btn:hover {
+  background: #47b2e4;
+  color: #fff;
+}
+
+.pricing .featured {
+  border-top-color: #47b2e4;
+}
+
+.pricing .featured .buy-btn {
+  background: #47b2e4;
+  color: #fff;
+}
+
+.pricing .featured .buy-btn:hover {
+  background: #23a3df;
+}
+
+@media (max-width: 992px) {
+  .pricing .box {
+    max-width: 60%;
+    margin: 0 auto 30px auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .pricing .box {
+    max-width: 80%;
+    margin: 0 auto 30px auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .pricing .box {
+    max-width: 100%;
+    margin: 0 auto 30px auto;
+  }
+}
+
+/*--------------------------------------------------------------
+# Frequently Asked Questions
+--------------------------------------------------------------*/
+.faq .faq-list {
+  padding: 0 100px;
+}
+
+.faq .faq-list ul {
+  padding: 0;
+  list-style: none;
+}
+
+.faq .faq-list li+li {
+  margin-top: 15px;
+}
+
+.faq .faq-list li {
+  padding: 20px;
+  background: #fff;
+  border-radius: 4px;
+  position: relative;
+}
+
+.faq .faq-list a {
+  display: block;
+  position: relative;
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+  padding: 0 30px;
+  outline: none;
+  cursor: pointer;
+}
+
+.faq .faq-list .icon-help {
+  font-size: 24px;
+  position: absolute;
+  right: 0;
+  left: 20px;
+  color: #47b2e4;
+}
+
+.faq .faq-list .icon-show,
+.faq .faq-list .icon-close {
+  font-size: 24px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.faq .faq-list p {
+  margin-bottom: 0;
+  padding: 10px 0 0 0;
+}
+
+.faq .faq-list .icon-show {
+  display: none;
+}
+
+.faq .faq-list a.collapsed {
+  color: #37517e;
+  transition: 0.3s;
+}
+
+.faq .faq-list a.collapsed:hover {
+  color: #47b2e4;
+}
+
+.faq .faq-list a.collapsed .icon-show {
+  display: inline-block;
+}
+
+.faq .faq-list a.collapsed .icon-close {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .faq .faq-list {
+    padding: 0;
+  }
+}
+
+/*--------------------------------------------------------------
+# Contact
+--------------------------------------------------------------*/
+.contact .info {
+  border-top: 3px solid #47b2e4;
+  border-bottom: 3px solid #47b2e4;
+  padding: 30px;
+  background: #fff;
+  width: 100%;
+  box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.1);
+}
+
+.contact .info i {
+  font-size: 20px;
+  color: #47b2e4;
+  float: left;
+  width: 44px;
+  height: 44px;
+  background: #e7f5fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50px;
+  transition: all 0.3s ease-in-out;
+}
+
+.contact .info h4 {
+  padding: 0 0 0 60px;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #37517e;
+}
+
+.contact .info p {
+  padding: 0 0 10px 60px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #6182ba;
+}
+
+.contact .info .email p {
+  padding-top: 5px;
+}
+
+.contact .info .social-links {
+  padding-left: 60px;
+}
+
+.contact .info .social-links a {
+  font-size: 18px;
+  display: inline-block;
+  background: #333;
+  color: #fff;
+  line-height: 1;
+  padding: 8px 0;
+  border-radius: 50%;
+  text-align: center;
+  width: 36px;
+  height: 36px;
+  transition: 0.3s;
+  margin-right: 10px;
+}
+
+.contact .info .social-links a:hover {
+  background: #47b2e4;
+  color: #fff;
+}
+
+.contact .info .email:hover i,
+.contact .info .address:hover i,
+.contact .info .phone:hover i {
+  background: #47b2e4;
+  color: #fff;
+}
+
+.contact .php-email-form {
+  width: 100%;
+  border-top: 3px solid #47b2e4;
+  border-bottom: 3px solid #47b2e4;
+  padding: 30px;
+  background: #fff;
+  box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.12);
+}
+
+.contact .php-email-form .form-group {
+  padding-bottom: 8px;
+}
+
+.contact .php-email-form .validate {
+  display: none;
+  color: red;
+  margin: 0 0 15px 0;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.contact .php-email-form .error-message {
+  display: none;
+  color: #fff;
+  background: #ed3c0d;
+  text-align: left;
+  padding: 15px;
+  font-weight: 600;
+}
+
+.contact .php-email-form .error-message br+br {
+  margin-top: 25px;
+}
+
+.contact .php-email-form .sent-message {
+  display: none;
+  color: #fff;
+  background: #18d26e;
+  text-align: center;
+  padding: 15px;
+  font-weight: 600;
+}
+
+.contact .php-email-form .loading {
+  display: none;
+  background: #fff;
+  text-align: center;
+  padding: 15px;
+}
+
+.contact .php-email-form .loading:before {
+  content: "";
+  display: inline-block;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  margin: 0 10px -6px 0;
+  border: 3px solid #18d26e;
+  border-top-color: #eee;
+  animation: animate-loading 1s linear infinite;
+}
+
+.contact .php-email-form .form-group {
+  margin-bottom: 20px;
+}
+
+.contact .php-email-form label {
+  padding-bottom: 8px;
+}
+
+.contact .php-email-form input,
+.contact .php-email-form textarea {
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.contact .php-email-form input:focus,
+.contact .php-email-form textarea:focus {
+  border-color: #47b2e4;
+}
+
+.contact .php-email-form input {
+  height: 44px;
+}
+
+.contact .php-email-form textarea {
+  padding: 10px 12px;
+}
+
+.contact .php-email-form button[type=submit] {
+  background: #47b2e4;
+  border: 0;
+  padding: 12px 34px;
+  color: #fff;
+  transition: 0.4s;
+  border-radius: 50px;
+}
+
+.contact .php-email-form button[type=submit]:hover {
+  background: #209dd8;
+}
+
+@keyframes animate-loading {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/*--------------------------------------------------------------
+# Breadcrumbs
+--------------------------------------------------------------*/
+.breadcrumbs {
+  padding: 15px 0;
+  background: #f3f5fa;
+  min-height: 40px;
+  margin-top: 72px;
+}
+
+@media (max-width: 992px) {
+  .breadcrumbs {
+    margin-top: 68px;
+  }
+}
+
+.breadcrumbs h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #37517e;
+}
+
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0 0 10px 0;
+  margin: 0;
+  font-size: 14px;
+}
+
+.breadcrumbs ol li+li {
+  padding-left: 10px;
+}
+
+.breadcrumbs ol li+li::before {
+  display: inline-block;
+  padding-right: 10px;
+  color: #4668a2;
+  content: "/";
+}
+
+/*--------------------------------------------------------------
+# Footer
+--------------------------------------------------------------*/
+#footer {
+  font-size: 14px;
+  background: #37517e;
+}
+
+#footer .footer-newsletter {
+  padding: 50px 0;
+  background: #f3f5fa;
+  text-align: center;
+  font-size: 15px;
+  color: #444444;
+}
+
+#footer .footer-newsletter h4 {
+  font-size: 24px;
+  margin: 0 0 20px 0;
+  padding: 0;
+  line-height: 1;
+  font-weight: 600;
+  color: #37517e;
+}
+
+#footer .footer-newsletter form {
+  margin-top: 30px;
+  background: #fff;
+  padding: 6px 10px;
+  position: relative;
+  border-radius: 50px;
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.06);
+  text-align: left;
+}
+
+#footer .footer-newsletter form input[type=email] {
+  border: 0;
+  padding: 4px 8px;
+  width: calc(100% - 100px);
+}
+
+#footer .footer-newsletter form input[type=submit] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border: 0;
+  background: none;
+  font-size: 16px;
+  padding: 0 20px;
+  background: #47b2e4;
+  color: #fff;
+  transition: 0.3s;
+  border-radius: 50px;
+  box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+#footer .footer-newsletter form input[type=submit]:hover {
+  background: #209dd8;
+}
+
+#footer .footer-top {
+  padding: 60px 0 30px 0;
+  background: #fff;
+}
+
+#footer .footer-top .footer-contact {
+  margin-bottom: 30px;
+}
+
+#footer .footer-top .footer-contact h3 {
+  font-size: 28px;
+  margin: 0 0 10px 0;
+  padding: 2px 0 2px 0;
+  line-height: 1;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #37517e;
+}
+
+#footer .footer-top .footer-contact p {
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 0;
+  font-family: "Jost", sans-serif;
+  color: #5e5e5e;
+}
+
+#footer .footer-top h4 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #37517e;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+#footer .footer-top .footer-links {
+  margin-bottom: 30px;
+}
+
+#footer .footer-top .footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#footer .footer-top .footer-links ul i {
+  padding-right: 2px;
+  color: #47b2e4;
+  font-size: 18px;
+  line-height: 1;
+}
+
+#footer .footer-top .footer-links ul li {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+}
+
+#footer .footer-top .footer-links ul li:first-child {
+  padding-top: 0;
+}
+
+#footer .footer-top .footer-links ul a {
+  color: #777777;
+  transition: 0.3s;
+  display: inline-block;
+  line-height: 1;
+}
+
+#footer .footer-top .footer-links ul a:hover {
+  text-decoration: none;
+  color: #47b2e4;
+}
+
+#footer .footer-top .social-links a {
+  font-size: 18px;
+  display: inline-block;
+  background: #47b2e4;
+  color: #fff;
+  line-height: 1;
+  padding: 8px 0;
+  margin-right: 4px;
+  border-radius: 50%;
+  text-align: center;
+  width: 36px;
+  height: 36px;
+  transition: 0.3s;
+}
+
+#footer .footer-top .social-links a:hover {
+  background: #209dd8;
+  color: #fff;
+  text-decoration: none;
+}
+
+#footer .footer-bottom {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  color: #fff;
+}
+
+#footer .copyright {
+  float: left;
+}
+
+#footer .credits {
+  float: right;
+  font-size: 13px;
+}
+
+#footer .credits a {
+  transition: 0.3s;
+}
+
+@media (max-width: 768px) {
+  #footer .footer-bottom {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  #footer .copyright,
+  #footer .credits {
+    text-align: center;
+    float: none;
+  }
+
+  #footer .credits {
+    padding-top: 4px;
+  }
+}
+
+=== D:/Angular/hello-world/src/app\home\home.component.html ===
+
+
+<div>
+
+    <header id="header" class="fixed-top header-inner-pages">
+      <div class="container d-flex align-items-center">
+  
+        <h1 class="logo me-auto" style="color: white;">Mepco Schlenk Engineering College</h1>
+        
+        <nav id="navbar" class="navbar">
+          <ul>
+            
+           <li *ngIf="!this.authService.isLoggedIn()"><a class="getstarted scrollto" routerLink="/login" href="javascript:void(0);">Login</a></li>
+  <li *ngIf="!this.authService.isLoggedIn()"><a class="getstarted scrollto" routerLink="/register" href="javascript:void(0);">Register</a></li>
+          
+  
+    <li *ngIf="this.authService.isLoggedIn() && !admin1"><a class="getstarted scrollto"   routerLink="/book" href="javascript:void(0);"> Book Bus Now! </a></li>
+    <li *ngIf="this.authService.isLoggedIn() && !admin1"><a class="getstarted scrollto"   routerLink="/userreserves" href="javascript:void(0);"> See your reservations </a></li>
+    <li *ngIf="admin1"><a class="getstarted scrollto" routerLink="/admin">Admin Page</a></li>
+
+    <li  *ngIf="this.authService.isLoggedIn()"><a class="getstarted scrollto"  (click)="logout()" href="javascript:void(0);">Logout</a></li>
+
+            
+            <li *ngIf="!admin1"><a class="nav-link scrollto" href="#contact">Contact</a></li>
+          </ul>
+          <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav>
+  
+      </div>
+    </header>
+  
+    <main id="main">
+  
+      <section id="breadcrumbs" class="breadcrumbs">
+        <div class="container">
+  
+          <ol>
+          </ol><br>
+          <h2 class="text-center">Welcome to MSEC hostel's dedicated bus service – your safe passage home every weekend!</h2>
+  
+        </div>
+      </section>
+  
+      <section id="portfolio-details" class="portfolio-details">
+        <div class="container">
+  
+          <div class="row gy-4">
+  
+            <div class="col-lg-8">
+                <div class="portfolio-details-slider swiper ">
+                  <div class="swiper-wrapper align-items-center">
+    
+                    
+                    <div  class="swiper-slide  text-center" >
+                      <img  src=" ../assets\img\portfolio\p3.jpg"  style="border-radius: 10px;height: 50%; width: 50%;" alt="">
+                    </div>
+    
+                  </div>
+                 
+                </div>
+              </div>
+  
+            <div class="col-lg-4">
+              <div class="portfolio-info">
+                <h2 class="text-center">Give Futuristic Ride</h2>
+                <p>At MSEC Hostels, we prioritize the well-being and convenience of our hostellers, ensuring a seamless journey back to your loved ones.
+
+                    Forget the hassle of arranging transportation or worrying about late-night travels. Our reliable bus service operates like clockwork, providing a comfortable and secure journey for all. With experienced drivers at the helm and adherence to strict safety protocols, your peace of mind is our top priority.</p>
+              </div><br><br>
+              <div class="portfolio-info">
+                <h2 class="text-center">Why our service?</h2>
+                <p>
+                    Whether you're eager to reunite with family, catch up with old friends, or simply unwind in the comfort of home, our weekend bus service has you covered. Say goodbye to the stress of travel logistics and hello to worry-free weekends.
+
+                    Stay connected with us for the latest schedules, routes, and any updates regarding our bus service. Your journey home starts here. Hop aboard and let us take you where you need to be.                </p>
+              </div>
+            </div>
+  
+          </div>
+          <br><br><br>
+          <div class="row">
+            <div class="col">
+          <div class="align-items-center portfolio-info">
+            <h2 class="text-center" >What makes us special?</h2>
+            <p class="">
+                Imagine this: You're ready to head home for the weekend from college. But instead of worrying about how to get there, you can simply jump on our comfy bus right from your hostel.
+
+Our weekend bus service is like having your own personal driver, but better. We've got really comfy seats, plenty of space for your bags, and maybe even some snacks if you're hungry. Plus, our drivers are really good at what they do, so you're safe with us.
+
+It's like a stress-free ticket straight home. No need to stress about parking, catching trains, or asking for rides from friends. Just relax, sit back, and enjoy the journey.
+
+Whether you're going to see family, hang out with friends, or just want to unwind at home, our bus service is here for you. So, get ready for a smooth ride home, without any worries.
+            </p>
+          </div>
+            </div>
+          </div>
+        </div>
+      </section>
+  
+    </main>
+  
+  
+    <footer id="footer">
+  
+      <div class="footer-newsletter">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-lg-6">
+              <h4>Travel is the only thing you buy that makes you richer.</h4>
+              <p></p>
+              
+                <a href="javascript:void(0);" routerLink="/book" class="btn btn-primary">Book your Bus Now!</a>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="footer-top">
+        <div class="container">
+          <div class="row">
+  
+            <div class="col-lg-3 col-md-6 footer-contact" id="contact">
+              <h3>Contact Us</h3>
+              <p>
+                MSEC, Mepco Nagar<br>
+                Sivakasi,626101<br>
+                 <br><br>
+                <strong>Phone:</strong> +91 9894194545<br>
+                <strong>Email:</strong> MSEC&#64;mepcoeng.ac.in
+              </p>
+            </div>
+  
+            
+  
+    
+  
+            <div class="col-lg-3 col-md-6 footer-links" id="contact">
+              <h4>Our Social Networks</h4>
+              <div class="social-links mt-3">
+                <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
+                <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
+                <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
+                <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+              </div>
+            </div>
+  
+          </div>
+        </div>
+      </div>
+  
+      <div class="container footer-bottom clearfix">
+        <div class="copyright">
+          
+        </div>
+        <div class="credits">
+          Designed by Sriram, Vijesh, Prabhu
+        </div>
+      </div>
+    </footer>
+  
+    
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+</div>  
+
+=== D:/Angular/hello-world/src/app\home\home.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { HomeComponent } from './home.component';
+
+describe('HomeComponent', () => {
+  let component: HomeComponent;
+  let fixture: ComponentFixture<HomeComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [HomeComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(HomeComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\home\home.component.ts ===
+ import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css','../../assets/bootstrap.min.css','../../assets/vendor/remixicon/remixicon.css',"../../assets/vendor/swiper/swiper-bundle.min.css","../../assets/vendor/glightbox/css/glightbox.min.css","../../assets/vendor/boxicons/css/boxicons.min.css","../../assets/vendor/aos/aos.css","../../assets/vendor/bootstrap-icons/bootstrap-icons.css"]
+})
+export class HomeComponent implements OnInit{
+  constructor(public authService: AuthService,private router:Router) {
+
+  }
+admin1:boolean=false;
+ ngOnInit(){
+
+  this.admin1=(sessionStorage.getItem('role')==='admin')
+ }
+  logout(): void {
+    this.admin1=false;
+    this.authService.logout();  
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\login\login.component.css ===
+#body {
+    background: linear-gradient(135deg, #00aaff, #ff00aa); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    width: 80%; 
+    max-width: 500px;
+    background-color: white;
+    border-radius: 10px;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+.form-control{
+    border: 1px solid black !important;
+    border-radius: 10px !important;
+    background-color: rgb(182, 177, 172);
+}
+.form-control:hover{
+    
+    background-color: rgb(156, 98, 137);
+}
+
+=== D:/Angular/hello-world/src/app\login\login.component.html ===
+ 
+<div id="body">
+  <div class="container">
+    <div class="card">
+
+    <h2 class="text-center m-5">Login</h2>
+    <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" class="form-control" name="username" [(ngModel)]="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" class="form-control" id="password" name="password" [(ngModel)]="password" required>
+      </div><br>
+      <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
+  </div>
+  </div>
+</div>
+  
+
+  
+
+=== D:/Angular/hello-world/src/app\login\login.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LoginComponent } from './login.component';
+
+describe('LoginComponent', () => {
+  let component: LoginComponent;
+  let fixture: ComponentFixture<LoginComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [LoginComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\login\login.component.ts ===
+ 
+
+import { Component,OnInit } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css','../../assets/bootstrap.min.css']
+})
+export class LoginComponent implements OnInit {
+  username: string = '';
+  password: string = '';
+  errorMessage: string = '';
+  ngOnInit(): void {
+      if(this.authService.isLoggedIn()){
+        this.router.navigateByUrl("/");
+      }
+  }
+  constructor(private authService: AuthService, private router: Router) { }
+
+  login(): void {
+    this.authService.login(this.username, this.password).subscribe(
+      (response) => {
+         console.log(response.token);
+        sessionStorage.setItem("name",response.user.name)
+        sessionStorage.setItem("uid",response.user.username)
+        sessionStorage.setItem("gender",response.user.gender)
+        sessionStorage.setItem("phone",response.user.phone)
+        sessionStorage.setItem("role",response.user.role)
+
+        this.router.navigateByUrl('/home');
+
+      },
+      (error) => {
+         this.errorMessage = error.error.message;
+      }
+    );
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\register\register.component.css ===
+#body {
+    background: linear-gradient(135deg, #00aaff, #ff00aa); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 120vh;
+  }
+  .container {
+    width: 80%; 
+    max-width: 150px;
+    background-color: white;
+    border-radius: 10px;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+.form-control{
+    border: 1px solid black !important;
+    border-radius: 10px !important;
+    background-color: rgb(182, 177, 172);
+    margin: 1px !important;
+}
+.form-control:hover{
+    
+    background-color: rgb(207, 182, 198);
+}
+
+=== D:/Angular/hello-world/src/app\register\register.component.html ===
+<div id="body">
+<div class="container">
+    <div class="card">
+      <h2 class="text-center m-5">Register</h2>
+
+    <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
+    <form (ngSubmit)="register()" >
+      <div class="form-group ">
+        <label for="username">Username:</label>
+        <input class="form-control" type="text" id="username" name="username" [(ngModel)]="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input class="form-control" type="password" id="password" name="password" [(ngModel)]="password" required>
+      </div>
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input class="form-control" type="text" id="password" name="name" [(ngModel)]="name" required>
+      </div>
+      <div class="form-group">
+        <label for="age">Age:</label>
+        <input class="form-control" type="number" id="age" name="age" [(ngModel)]="age" required>
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone:</label>
+        <input class="form-control" type="number" id="phone" name="phone" [(ngModel)]="phone" required>
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender:</label>
+        <input class="form-control" type="text" id="gender" name="gender" [(ngModel)]="gender" required>
+      </div>
+      <div class="form-group">
+        <label for="addr">Address:</label>
+        <input class="form-control" type="text" id="addr" name="addr" [(ngModel)]="addr" required>
+      </div>
+      <div class="form-group">
+        <label for="adhaar">Adhaar Number:</label>
+        <input class="form-control" type="text" id="adhaar" name="adhaar" [(ngModel)]="adhaar" required>
+      </div><br>
+      <button class="btn btn-primary btn-block" type="submit">Register</button>
+    </form>
+  </div>
+</div>
+</div>
+  
+
+=== D:/Angular/hello-world/src/app\register\register.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { RegisterComponent } from './register.component';
+
+describe('RegisterComponent', () => {
+  let component: RegisterComponent;
+  let fixture: ComponentFixture<RegisterComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [RegisterComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(RegisterComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\register\register.component.ts ===
+ 
+
+import { Component } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css','../../assets/bootstrap.min.css']
+})
+export class RegisterComponent {
+  username: string = '';
+  password: string = '';
+  name:string="";
+  age:number=0;
+  phone:number=0;
+  gender:string="";
+  addr:string="";
+  adhaar:number=0;
+  role:string="user"
+  errorMessage: string = '';
+
+  ngOnInit(): void {
+    if(this.authService.isLoggedIn()){
+      this.router.navigateByUrl("/");
+    }
+}
+  constructor(private authService: AuthService,private router:Router) { }
+
+  register(): void {
+    this.authService.register(this.username, this.password,this.name,this.age,this.phone,this.gender,this.addr,this.adhaar,this.role).subscribe(
+      (response) => {
+         console.log(response.message);
+        
+        this.authService.login(this.username, this.password).subscribe(
+          (response) => {
+             console.log(response.token);
+            this.router.navigateByUrl('/home');
+    
+          },
+          (error) => {
+             this.errorMessage = error.error.message;
+          }
+        );
+
+      },
+      (error) => {
+         this.errorMessage = error.error.message;
+      }
+    );
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\reservations\reservations.component.css ===
+/* Style for the header */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  #con1{
+    background: linear-gradient(135deg, #00aaff, #ff00aa);
+  }
+  .container {
+
+    background-color: white;
+  }
+  /* Style for error message */
+  .alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Style for the table */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  
+  /* Style for table header */
+  th {
+    background-color: #f8f9fa;
+    color: #343a40;
+    font-weight: bold;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  /* Style for table cells */
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  /* Style for alternating row colors */
+  tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  /* Style for reservation rows */
+  tr.reservation-row:hover {
+    background-color: #e9ecef;
+  }
+  #con1 {
+    background: linear-gradient(135deg, #00aaff, #ff00aa); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    width: 80%; 
+    max-width: 500px;
+    background-color: white;
+    border-radius: 10px;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+
+=== D:/Angular/hello-world/src/app\reservations\reservations.component.html ===
+
+<div id="con1">
+<div class="container">
+
+<h1 class="text-center">All Reservations</h1>
+
+<div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+  {{ errorMessage }}
+</div>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Phone</th>
+      <th scope="col">Bus Id</th>
+      <th scope="col">Bus Name</th>
+      <th scope="col">Destination</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let reservation of reservations">
+      <td>{{ reservation.name }}</td>
+      <td>{{ reservation.phone }}</td>
+      <td>{{ reservation.busNumber }}</td>
+
+      <td>{{ reservation.busname }}</td>
+      <td>{{ reservation.end }}</td>
+      
+    </tr>
+  </tbody>
+</table>
+</div></div>
+
+=== D:/Angular/hello-world/src/app\reservations\reservations.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ReservationsComponent } from './reservations.component';
+
+describe('ReservationsComponent', () => {
+  let component: ReservationsComponent;
+  let fixture: ComponentFixture<ReservationsComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ReservationsComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(ReservationsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\reservations\reservations.component.ts ===
+import { Component } from '@angular/core';
+import {  OnInit } from '@angular/core';
+import { BusService } from '../bus.service';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-reservations',
+  templateUrl: './reservations.component.html',
+  styleUrls: ['./reservations.component.css']
+})
+export class ReservationsComponent implements OnInit {
+  reservations: any[] = [];
+  errorMessage: string = '';
+
+  constructor(private reservationService: BusService) { }
+
+  ngOnInit(): void {
+    this.loadReservations();
+  }
+
+  loadReservations(): void {
+    this.reservationService.getReserve().subscribe(
+      (reservations) => {
+        this.reservations = reservations;
+      },
+      (error) => {
+        this.errorMessage = error.message;
+      }
+    );
+  }
+}
+
+
+=== D:/Angular/hello-world/src/app\specific-reserves\specific-reserves.component.css ===
+/* Style for the header */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  #con1{
+    background: linear-gradient(135deg, #00aaff, #ff00aa);
+  }
+  .container {
+
+    background-color: white;
+  }
+  /* Style for error message */
+  .alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 20px;
+  }
+  
+  /* Style for the table */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  
+  /* Style for table header */
+  th {
+    background-color: #f8f9fa;
+    color: #343a40;
+    font-weight: bold;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  /* Style for table cells */
+  td {
+    padding: 8px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  /* Style for alternating row colors */
+  tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  /* Style for reservation rows */
+  tr.reservation-row:hover {
+    background-color: #e9ecef;
+  }
+  #con1 {
+    background: linear-gradient(135deg, #00aaff, #ff00aa); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    width: 80%; 
+    max-width: 500px;
+    background-color: white;
+    border-radius: 10px;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+
+=== D:/Angular/hello-world/src/app\specific-reserves\specific-reserves.component.html ===
+
+<div id="con1">
+    <div class="container">
+    
+    <h1 class="text-center">Your Reservations</h1>
+    
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
+    
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Phone</th>
+          <th scope="col">Bus Id</th>
+          <th scope="col">Bus Name</th>
+          <th scope="col">Destination</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let reservation of reqreserves">
+          <td>{{ reservation.name }}</td>
+          <td>{{ reservation.phone }}</td>
+          <td>{{ reservation.busNumber }}</td>
+    
+          <td>{{ reservation.busname }}</td>
+          <td>{{ reservation.end }}</td>
+          
+        </tr>
+      </tbody>
+    </table>
+    </div></div>
+
+=== D:/Angular/hello-world/src/app\specific-reserves\specific-reserves.component.spec.ts ===
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { SpecificReservesComponent } from './specific-reserves.component';
+
+describe('SpecificReservesComponent', () => {
+  let component: SpecificReservesComponent;
+  let fixture: ComponentFixture<SpecificReservesComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [SpecificReservesComponent]
+    })
+    .compileComponents();
+    
+    fixture = TestBed.createComponent(SpecificReservesComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+=== D:/Angular/hello-world/src/app\specific-reserves\specific-reserves.component.ts ===
+import { Component } from '@angular/core';
+import {  OnInit } from '@angular/core';
+import { BusService } from '../bus.service';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-specific-reserves',
+  templateUrl: './specific-reserves.component.html',
+  styleUrl: './specific-reserves.component.css'
+})
+export class SpecificReservesComponent {
+  reservations: any[] = [];
+  errorMessage: string = '';
+  reqreserves:any[]=[]
+
+  constructor(private reservationService: BusService) { }
+
+  ngOnInit(): void {
+    this.loadReservations();
+  }
+
+  loadReservations(): void {
+    this.reservationService.getReserve().subscribe(
+      (reservations) => {
+        this.reservations = reservations;
+        this.sortReserves();
+      },
+      (error) => {
+        this.errorMessage = error.message;
+      }
+    );
+  }
+  sortReserves(){
+    const phoneNumber = sessionStorage.getItem("phone");
+
+    if (phoneNumber) {
+      this.reqreserves = this.reservations.filter((reservation) => {
+        return reservation.phone == phoneNumber;
+      });
+      console.log(this.reqreserves)
+    } else {
+      this.reqreserves = []; 
+    }
+  }
+  
+}
+
+
